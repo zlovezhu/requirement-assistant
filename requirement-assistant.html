@@ -565,6 +565,158 @@
     align-items: center;
   }
 
+  /* 新的下拉筛选器样式 */
+  .filter-dropdown {
+    position: relative;
+    display: inline-block;
+  }
+
+  .filter-dropdown-btn {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    background: var(--card);
+    transition: all .15s;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 90px;
+    justify-content: space-between;
+  }
+
+  .filter-dropdown-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .filter-dropdown-btn.has-selection {
+    background: #eef0ff;
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .filter-dropdown-btn .dropdown-arrow {
+    font-size: 8px;
+    transition: transform .2s;
+  }
+
+  .filter-dropdown.open .dropdown-arrow {
+    transform: rotate(180deg);
+  }
+
+  .filter-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    min-width: 160px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    z-index: 1000;
+    display: none;
+    padding: 6px 0;
+  }
+
+  .filter-dropdown.open .filter-dropdown-menu {
+    display: block;
+  }
+
+  .filter-dropdown-item {
+    padding: 8px 12px;
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background .15s;
+    color: var(--text);
+  }
+
+  .filter-dropdown-item:hover {
+    background: var(--bg);
+  }
+
+  .filter-dropdown-item.selected {
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .filter-dropdown-item .check-icon {
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    flex-shrink: 0;
+  }
+
+  .filter-dropdown-item.selected .check-icon {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+
+  .filter-dropdown-item .item-label {
+    flex: 1;
+  }
+
+  .filter-dropdown-item .item-count {
+    font-size: 10px;
+    padding: 2px 6px;
+    background: rgba(0,0,0,0.06);
+    border-radius: 10px;
+    color: var(--text-secondary);
+  }
+
+  .filter-dropdown-item.selected .item-count {
+    background: rgba(124,140,245,0.2);
+    color: var(--accent);
+  }
+
+  .filter-dropdown-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 6px 0;
+  }
+
+  .filter-selected-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-left: 4px;
+  }
+
+  .filter-selected-tag {
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    background: #eef0ff;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .filter-selected-tag .remove-tag {
+    cursor: pointer;
+    font-size: 12px;
+    line-height: 1;
+    opacity: 0.7;
+  }
+
+  .filter-selected-tag .remove-tag:hover {
+    opacity: 1;
+  }
+
+  /* 旧的按钮样式保留作备用 */
   .filter-tag {
     padding: 4px 10px;
     border-radius: 20px;
@@ -1792,35 +1944,116 @@
     <!-- Table Panel -->
     <div class="panel-table" id="panelTable">
       <div class="table-toolbar">
-        <div class="filter-group" id="filterGroupPriority">
-          <button class="filter-tag active" data-filter-priority="all">全部<span class="filter-count" id="countPriorityAll">0</span></button>
-          <button class="filter-tag" data-filter-priority="P0">P0<span class="filter-count" id="countPriorityP0">0</span></button>
-          <button class="filter-tag" data-filter-priority="P1">P1<span class="filter-count" id="countPriorityP1">0</span></button>
-          <button class="filter-tag" data-filter-priority="P2">P2<span class="filter-count" id="countPriorityP2">0</span></button>
-          <button class="filter-tag" data-filter-priority="P3">P3<span class="filter-count" id="countPriorityP3">0</span></button>
+        <!-- 优先级筛选 -->
+        <div class="filter-dropdown" id="filterDropdownPriority">
+          <button class="filter-dropdown-btn" onclick="toggleFilterDropdown('Priority')">
+            <span class="btn-label">优先级</span>
+            <span class="dropdown-arrow">▼</span>
+          </button>
+          <div class="filter-dropdown-menu">
+            <div class="filter-dropdown-item" data-filter="priority" data-value="P0">
+              <span class="check-icon">✓</span>
+              <span class="item-label">P0</span>
+              <span class="item-count" id="countPriorityP0">0</span>
+            </div>
+            <div class="filter-dropdown-item" data-filter="priority" data-value="P1">
+              <span class="check-icon">✓</span>
+              <span class="item-label">P1</span>
+              <span class="item-count" id="countPriorityP1">0</span>
+            </div>
+            <div class="filter-dropdown-item" data-filter="priority" data-value="P2">
+              <span class="check-icon">✓</span>
+              <span class="item-label">P2</span>
+              <span class="item-count" id="countPriorityP2">0</span>
+            </div>
+            <div class="filter-dropdown-item" data-filter="priority" data-value="P3">
+              <span class="check-icon">✓</span>
+              <span class="item-label">P3</span>
+              <span class="item-count" id="countPriorityP3">0</span>
+            </div>
+          </div>
         </div>
-        <div class="filter-divider"></div>
-        <div class="filter-group" id="filterGroupSource">
-          <button class="filter-tag active" data-filter-source="all">全部来源<span class="filter-count" id="countSourceAll">0</span></button>
-          <button class="filter-tag" data-filter-source="用户反馈">用户反馈<span class="filter-count" id="countSourceFeedback">0</span></button>
-          <button class="filter-tag" data-filter-source="用户调研">用户调研<span class="filter-count" id="countSourceResearch">0</span></button>
-          <button class="filter-tag" data-filter-source="产品规划">产品规划<span class="filter-count" id="countSourcePlan">0</span></button>
+
+        <!-- 来源筛选 -->
+        <div class="filter-dropdown" id="filterDropdownSource">
+          <button class="filter-dropdown-btn" onclick="toggleFilterDropdown('Source')">
+            <span class="btn-label">来源</span>
+            <span class="dropdown-arrow">▼</span>
+          </button>
+          <div class="filter-dropdown-menu">
+            <div class="filter-dropdown-item" data-filter="source" data-value="用户反馈">
+              <span class="check-icon">✓</span>
+              <span class="item-label">用户反馈</span>
+              <span class="item-count" id="countSourceFeedback">0</span>
+            </div>
+            <div class="filter-dropdown-item" data-filter="source" data-value="用户调研">
+              <span class="check-icon">✓</span>
+              <span class="item-label">用户调研</span>
+              <span class="item-count" id="countSourceResearch">0</span>
+            </div>
+            <div class="filter-dropdown-item" data-filter="source" data-value="产品规划">
+              <span class="check-icon">✓</span>
+              <span class="item-label">产品规划</span>
+              <span class="item-count" id="countSourcePlan">0</span>
+            </div>
+          </div>
         </div>
-        <div class="filter-divider"></div>
-        <div class="filter-group" id="filterGroupFiled">
-          <button class="filter-tag active" data-filter-filed="all">全部状态<span class="filter-count" id="countFiledAll">0</span></button>
-          <button class="filter-tag" data-filter-filed="no">未提单<span class="filter-count" id="countFiledNo">0</span></button>
-          <button class="filter-tag" data-filter-filed="yes">已提单<span class="filter-count" id="countFiledYes">0</span></button>
+
+        <!-- 状态筛选 -->
+        <div class="filter-dropdown" id="filterDropdownFiled">
+          <button class="filter-dropdown-btn" onclick="toggleFilterDropdown('Filed')">
+            <span class="btn-label">状态</span>
+            <span class="dropdown-arrow">▼</span>
+          </button>
+          <div class="filter-dropdown-menu">
+            <div class="filter-dropdown-item" data-filter="filed" data-value="no">
+              <span class="check-icon">✓</span>
+              <span class="item-label">未提单</span>
+              <span class="item-count" id="countFiledNo">0</span>
+            </div>
+            <div class="filter-dropdown-item" data-filter="filed" data-value="yes">
+              <span class="check-icon">✓</span>
+              <span class="item-label">已提单</span>
+              <span class="item-count" id="countFiledYes">0</span>
+            </div>
+          </div>
         </div>
-        <div class="filter-divider"></div>
-        <div class="filter-group" id="filterGroupSchedule">
-          <button class="filter-tag active" data-filter-schedule="all">全部排期<span class="filter-count" id="countScheduleAll">0</span></button>
-          <button class="filter-tag" data-filter-schedule="一期">一期<span class="filter-count" id="countSchedule1">0</span></button>
-          <button class="filter-tag" data-filter-schedule="二期">二期<span class="filter-count" id="countSchedule2">0</span></button>
-          <button class="filter-tag" data-filter-schedule="三期">三期<span class="filter-count" id="countSchedule3">0</span></button>
-          <button class="filter-tag" data-filter-schedule="四期">四期<span class="filter-count" id="countSchedule4">0</span></button>
-          <button class="filter-tag" data-filter-schedule="">暂定<span class="filter-count" id="countScheduleNone">0</span></button>
+
+        <!-- 排期筛选 -->
+        <div class="filter-dropdown" id="filterDropdownSchedule">
+          <button class="filter-dropdown-btn" onclick="toggleFilterDropdown('Schedule')">
+            <span class="btn-label">排期</span>
+            <span class="dropdown-arrow">▼</span>
+          </button>
+          <div class="filter-dropdown-menu">
+            <div class="filter-dropdown-item" data-filter="schedule" data-value="一期">
+              <span class="check-icon">✓</span>
+              <span class="item-label">一期</span>
+              <span class="item-count" id="countSchedule1">0</span>
+            </div>
+            <div class="filter-dropdown-item" data-filter="schedule" data-value="二期">
+              <span class="check-icon">✓</span>
+              <span class="item-label">二期</span>
+              <span class="item-count" id="countSchedule2">0</span>
+            </div>
+            <div class="filter-dropdown-item" data-filter="schedule" data-value="三期">
+              <span class="check-icon">✓</span>
+              <span class="item-label">三期</span>
+              <span class="item-count" id="countSchedule3">0</span>
+            </div>
+            <div class="filter-dropdown-item" data-filter="schedule" data-value="四期">
+              <span class="check-icon">✓</span>
+              <span class="item-label">四期</span>
+              <span class="item-count" id="countSchedule4">0</span>
+            </div>
+            <div class="filter-dropdown-item" data-filter="schedule" data-value="">
+              <span class="check-icon">✓</span>
+              <span class="item-label">暂定</span>
+              <span class="item-count" id="countScheduleNone">0</span>
+            </div>
+          </div>
         </div>
+
         <span class="filter-result-count" id="filterResultCount">共 <strong>0</strong> 条</span>
         <input class="search-input" type="text" placeholder="搜索需求..." id="searchInput">
       </div>
@@ -2044,10 +2277,11 @@ const STORAGE_KEY = 'req_assistant_data';
 
 let requirements = [];
 let currentSource = 'auto';
-let filterPriority = 'all';
-let filterSource = 'all';
-let filterFiled = 'all';
-let filterSchedule = 'all';
+// 多选筛选器 - 空数组表示全部
+let filterPriority = [];
+let filterSource = [];
+let filterFiled = [];
+let filterSchedule = [];
 let searchQuery = '';
 let chatStarted = false;
 let pendingImages = []; // base64 images for current chat message
@@ -3037,7 +3271,6 @@ function updateFilterCounts() {
   const countP2 = requirements.filter(r => r.priority === 'P2').length;
   const countP3 = requirements.filter(r => r.priority === 'P3').length;
   
-  document.getElementById('countPriorityAll').textContent = total;
   document.getElementById('countPriorityP0').textContent = countP0;
   document.getElementById('countPriorityP1').textContent = countP1;
   document.getElementById('countPriorityP2').textContent = countP2;
@@ -3048,7 +3281,6 @@ function updateFilterCounts() {
   const countResearch = requirements.filter(r => r.source === '用户调研').length;
   const countPlan = requirements.filter(r => r.source === '产品规划').length;
   
-  document.getElementById('countSourceAll').textContent = total;
   document.getElementById('countSourceFeedback').textContent = countFeedback;
   document.getElementById('countSourceResearch').textContent = countResearch;
   document.getElementById('countSourcePlan').textContent = countPlan;
@@ -3057,7 +3289,6 @@ function updateFilterCounts() {
   const countNo = requirements.filter(r => r.filed === 'no').length;
   const countYes = requirements.filter(r => r.filed === 'yes').length;
   
-  document.getElementById('countFiledAll').textContent = total;
   document.getElementById('countFiledNo').textContent = countNo;
   document.getElementById('countFiledYes').textContent = countYes;
   
@@ -3068,7 +3299,6 @@ function updateFilterCounts() {
   const countSchedule4 = requirements.filter(r => r.schedule === '四期').length;
   const countScheduleNone = requirements.filter(r => !r.schedule || r.schedule === '').length;
   
-  document.getElementById('countScheduleAll').textContent = total;
   document.getElementById('countSchedule1').textContent = countSchedule1;
   document.getElementById('countSchedule2').textContent = countSchedule2;
   document.getElementById('countSchedule3').textContent = countSchedule3;
@@ -3084,10 +3314,11 @@ function renderTable() {
   updateFilterCounts();
 
   let filtered = requirements.filter(r => {
-    if (filterPriority !== 'all' && r.priority !== filterPriority) return false;
-    if (filterSource !== 'all' && r.source !== filterSource) return false;
-    if (filterFiled !== 'all' && r.filed !== filterFiled) return false;
-    if (filterSchedule !== 'all' && (r.schedule || '') !== filterSchedule) return false;
+    // 多选筛选：数组为空表示全部，否则检查是否包含
+    if (filterPriority.length > 0 && !filterPriority.includes(r.priority)) return false;
+    if (filterSource.length > 0 && !filterSource.includes(r.source)) return false;
+    if (filterFiled.length > 0 && !filterFiled.includes(r.filed)) return false;
+    if (filterSchedule.length > 0 && !filterSchedule.includes(r.schedule || '')) return false;
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       return (r.content + r.background + r.proposer + r.expected + (r.remark||'') + (r.other||'')).toLowerCase().includes(q);
@@ -3147,42 +3378,141 @@ function renderTable() {
   }).join('');
 }
 
-// Table filters
-document.querySelectorAll('[data-filter-priority]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('[data-filter-priority]').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    filterPriority = btn.dataset.filterPriority;
+// ===== 多选下拉筛选器 =====
+function toggleFilterDropdown(name) {
+  const dropdown = document.getElementById('filterDropdown' + name);
+  const wasOpen = dropdown.classList.contains('open');
+  
+  // 关闭所有下拉菜单
+  document.querySelectorAll('.filter-dropdown').forEach(d => d.classList.remove('open'));
+  
+  // 如果之前是关闭的，则打开当前的
+  if (!wasOpen) {
+    dropdown.classList.add('open');
+  }
+}
+
+// 点击外部关闭下拉菜单
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.filter-dropdown')) {
+    document.querySelectorAll('.filter-dropdown').forEach(d => d.classList.remove('open'));
+  }
+});
+
+// 初始化下拉菜单项点击事件
+document.querySelectorAll('.filter-dropdown-item').forEach(item => {
+  item.addEventListener('click', (e) => {
+    e.stopPropagation();
+    
+    const filterType = item.dataset.filter;
+    const value = item.dataset.value;
+    
+    // 获取对应的筛选数组
+    let filterArray;
+    switch (filterType) {
+      case 'priority': filterArray = filterPriority; break;
+      case 'source': filterArray = filterSource; break;
+      case 'filed': filterArray = filterFiled; break;
+      case 'schedule': filterArray = filterSchedule; break;
+    }
+    
+    // 切换选中状态
+    const index = filterArray.indexOf(value);
+    if (index > -1) {
+      filterArray.splice(index, 1);
+      item.classList.remove('selected');
+    } else {
+      filterArray.push(value);
+      item.classList.add('selected');
+    }
+    
+    // 更新按钮显示
+    updateFilterDropdownButton(filterType);
+    
+    // 重新渲染表格
     renderTable();
   });
 });
 
-document.querySelectorAll('[data-filter-source]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('[data-filter-source]').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    filterSource = btn.dataset.filterSource;
-    renderTable();
-  });
-});
+// 更新下拉按钮显示
+function updateFilterDropdownButton(filterType) {
+  const nameMap = {
+    priority: 'Priority',
+    source: 'Source', 
+    filed: 'Filed',
+    schedule: 'Schedule'
+  };
+  
+  const labelMap = {
+    priority: '优先级',
+    source: '来源',
+    filed: '状态',
+    schedule: '排期'
+  };
+  
+  let filterArray;
+  switch (filterType) {
+    case 'priority': filterArray = filterPriority; break;
+    case 'source': filterArray = filterSource; break;
+    case 'filed': filterArray = filterFiled; break;
+    case 'schedule': filterArray = filterSchedule; break;
+  }
+  
+  const dropdown = document.getElementById('filterDropdown' + nameMap[filterType]);
+  const btn = dropdown.querySelector('.filter-dropdown-btn');
+  const labelEl = btn.querySelector('.btn-label');
+  
+  if (filterArray.length === 0) {
+    labelEl.textContent = labelMap[filterType];
+    btn.classList.remove('has-selection');
+  } else if (filterArray.length === 1) {
+    // 单个选中时显示具体值
+    let displayValue = filterArray[0];
+    if (filterType === 'filed') {
+      displayValue = filterArray[0] === 'yes' ? '已提单' : '未提单';
+    } else if (filterType === 'schedule' && filterArray[0] === '') {
+      displayValue = '暂定';
+    }
+    labelEl.textContent = displayValue;
+    btn.classList.add('has-selection');
+  } else {
+    // 多个选中时显示数量
+    labelEl.textContent = `${labelMap[filterType]}(${filterArray.length})`;
+    btn.classList.add('has-selection');
+  }
+}
 
-document.querySelectorAll('[data-filter-filed]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('[data-filter-filed]').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    filterFiled = btn.dataset.filterFiled;
-    renderTable();
+// 更新所有下拉按钮状态
+function updateAllFilterButtons() {
+  ['priority', 'source', 'filed', 'schedule'].forEach(type => {
+    updateFilterDropdownButton(type);
+    
+    // 更新选中状态
+    const nameMap = {
+      priority: 'Priority',
+      source: 'Source',
+      filed: 'Filed', 
+      schedule: 'Schedule'
+    };
+    
+    let filterArray;
+    switch (type) {
+      case 'priority': filterArray = filterPriority; break;
+      case 'source': filterArray = filterSource; break;
+      case 'filed': filterArray = filterFiled; break;
+      case 'schedule': filterArray = filterSchedule; break;
+    }
+    
+    const dropdown = document.getElementById('filterDropdown' + nameMap[type]);
+    dropdown.querySelectorAll('.filter-dropdown-item').forEach(item => {
+      if (filterArray.includes(item.dataset.value)) {
+        item.classList.add('selected');
+      } else {
+        item.classList.remove('selected');
+      }
+    });
   });
-});
-
-document.querySelectorAll('[data-filter-schedule]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('[data-filter-schedule]').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    filterSchedule = btn.dataset.filterSchedule;
-    renderTable();
-  });
-});
+}
 
 document.getElementById('searchInput').addEventListener('input', (e) => {
   searchQuery = e.target.value;
