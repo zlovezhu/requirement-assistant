@@ -4496,7 +4496,11 @@ async function changePassword() {
   const storedHash = await getCloudPasswordHash();
   const currentHash = await hashPassword(currentPwd);
   
-  if (currentHash !== storedHash) {
+  // 验证密码：哈希匹配 或 默认密码明文匹配（与登录逻辑一致）
+  const isValid = (currentHash === storedHash) || 
+                  (currentPwd === 'admin123' && (storedHash === DEFAULT_PASSWORD_HASH || storedHash === null));
+  
+  if (!isValid) {
     showToast('error', '当前密码错误');
     return;
   }
