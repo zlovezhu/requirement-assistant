@@ -2080,7 +2080,7 @@ async function loadData() {
         remark: row.remark || '',
         remarkImages: row.remark_images || [],
         date: row.date,
-        filed: row.filed || false,
+        filed: row.filed === true || row.filed === 'yes' ? 'yes' : 'no',
         schedule: row.schedule || '',
         created_at: row.created_at,
         updated_at: row.updated_at
@@ -2165,7 +2165,7 @@ async function cloudAddRequirement(req) {
         remark: req.remark || '',
         remark_images: imageUrls.length > 0 ? imageUrls : req.remarkImages,
         date: req.date,
-        filed: req.filed || false,
+        filed: req.filed === 'yes' || req.filed === true,
         schedule: req.schedule || ''
       });
     
@@ -2208,7 +2208,7 @@ async function cloudUpdateRequirement(req) {
         remark: req.remark || '',
         remark_images: imageUrls,
         date: req.date,
-        filed: req.filed || false,
+        filed: req.filed === 'yes' || req.filed === true,
         schedule: req.schedule || '',
         updated_at: new Date().toISOString()
       })
@@ -4250,12 +4250,18 @@ async function copyPrdToClipboard() {
   }
 }
 
-function markFiledFromModal() {
+async function markFiledFromModal() {
   const reqId = document.getElementById('tapdReqId').value;
   const req = requirements.find(r => r.id === reqId);
   if (req && req.filed !== 'yes') {
     req.filed = 'yes';
     addHistory('filed', req, [{ field: 'filed', from: 'no', to: 'yes' }]);
+    
+    // 云端模式下更新到云端
+    if (isCloudMode) {
+      await cloudUpdateRequirement(req);
+    }
+    
     saveData();
     showToast('success', '已标记为提单完成');
     closeTapdModal();
