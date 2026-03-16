@@ -1,0 +1,11 @@
+# 忽略敏感文件和临时文件
+$null
+restore_data.sql
+wecom-reminder.js
+*.log
+.DS_Store
+Thumbs.db
+
+# 本地开发文件
+.vscode/
+.idea/
