@@ -578,7 +578,7 @@
     cursor: pointer;
     border: 1px solid var(--border);
     color: var(--text-secondary);
-    background: var(--card);
+    background: #ffffff;
     transition: all .15s;
     font-family: inherit;
     display: flex;
@@ -613,10 +613,10 @@
     top: calc(100% + 4px);
     left: 0;
     min-width: 160px;
-    background: var(--card);
-    border: 1px solid var(--border);
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     z-index: 1000;
     display: none;
     padding: 6px 0;
@@ -634,11 +634,11 @@
     align-items: center;
     gap: 8px;
     transition: background .15s;
-    color: var(--text);
+    color: #333333;
   }
 
   .filter-dropdown-item:hover {
-    background: var(--bg);
+    background: #f5f5f5;
   }
 
   .filter-dropdown-item.selected {
@@ -656,6 +656,8 @@
     justify-content: center;
     font-size: 10px;
     flex-shrink: 0;
+    color: transparent;
+    background: #ffffff;
   }
 
   .filter-dropdown-item.selected .check-icon {
@@ -685,6 +687,69 @@
     height: 1px;
     background: var(--border);
     margin: 6px 0;
+  }
+
+  /* Color dot in filter dropdown */
+  .color-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    border: 1px solid rgba(0,0,0,0.1);
+  }
+
+  /* Color index in table */
+  .color-index {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    color: #333;
+    border: 1px solid rgba(0,0,0,0.1);
+  }
+
+  .color-index:hover {
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+
+  /* Color picker popup */
+  .color-picker-popup {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 8px;
+    display: flex;
+    gap: 6px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  }
+
+  .color-option {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: white;
+    transition: transform 0.15s;
+    border: 2px solid transparent;
+  }
+
+  .color-option:hover {
+    transform: scale(1.15);
+  }
+
+  .color-option.active {
+    border-color: #333;
   }
 
   .filter-selected-tags {
@@ -1906,15 +1971,15 @@
           <p>直接用自然语言告诉我，我会帮你提取关键信息、补充细节，生成结构化的需求卡片。你还可以粘贴截图来辅助说明。</p>
           <div class="welcome-examples">
             <div class="welcome-example" onclick="fillExample(this)">
-              <div class="we-label">&#x1F4E2; 用户反馈</div>
+              <div class="we-label">&#x1F4AC; 示例1</div>
               用户张三反馈说数据导出太慢了，导出一个报表要等30秒，希望能快一些
             </div>
             <div class="welcome-example" onclick="fillExample(this)">
-              <div class="we-label">&#x1F50D; 用户调研</div>
+              <div class="we-label">&#x1F4AC; 示例2</div>
               今天访谈了3个用户，他们普遍反映筛选条件不够灵活，希望能支持自定义筛选组合
             </div>
             <div class="welcome-example" onclick="fillExample(this)">
-              <div class="we-label">&#x1F4A1; 产品规划</div>
+              <div class="we-label">&#x1F4AC; 示例3</div>
               我觉得首页的数据卡片应该支持拖拽排序，这样用户可以按自己的习惯自定义布局
             </div>
           </div>
@@ -1923,12 +1988,6 @@
 
       <!-- Input -->
       <div class="chat-input-area">
-        <div class="source-selector">
-          <button class="source-tag active" data-source="auto">&#x2728; 自动识别</button>
-          <button class="source-tag" data-source="用户反馈">&#x1F4E2; 用户反馈</button>
-          <button class="source-tag" data-source="用户调研">&#x1F50D; 用户调研</button>
-          <button class="source-tag" data-source="产品规划">&#x1F4A1; 产品规划</button>
-        </div>
         <div class="input-image-previews" id="inputImagePreviews"></div>
         <div class="chat-toolbar">
           <button class="toolbar-btn" id="btnAttachImage" title="插入图片">&#x1F4F7;</button>
@@ -1974,27 +2033,54 @@
           </div>
         </div>
 
-        <!-- 来源筛选 -->
-        <div class="filter-dropdown" id="filterDropdownSource">
-          <button class="filter-dropdown-btn" onclick="toggleFilterDropdown('Source')">
-            <span class="btn-label">来源</span>
+        <!-- 颜色筛选 -->
+        <div class="filter-dropdown" id="filterDropdownColor">
+          <button class="filter-dropdown-btn" onclick="toggleFilterDropdown('Color')">
+            <span class="btn-label">颜色</span>
             <span class="dropdown-arrow">▼</span>
           </button>
           <div class="filter-dropdown-menu">
-            <div class="filter-dropdown-item" data-filter="source" data-value="用户反馈">
+            <div class="filter-dropdown-item" data-filter="color" data-value="">
               <span class="check-icon">✓</span>
-              <span class="item-label">用户反馈</span>
-              <span class="item-count" id="countSourceFeedback">0</span>
+              <span class="color-dot" style="background:#ccc"></span>
+              <span class="item-label">无颜色</span>
+              <span class="item-count" id="countColorNone">0</span>
             </div>
-            <div class="filter-dropdown-item" data-filter="source" data-value="用户调研">
+            <div class="filter-dropdown-item" data-filter="color" data-value="red">
               <span class="check-icon">✓</span>
-              <span class="item-label">用户调研</span>
-              <span class="item-count" id="countSourceResearch">0</span>
+              <span class="color-dot" style="background:#ee7777"></span>
+              <span class="item-label">红色</span>
+              <span class="item-count" id="countColorRed">0</span>
             </div>
-            <div class="filter-dropdown-item" data-filter="source" data-value="产品规划">
+            <div class="filter-dropdown-item" data-filter="color" data-value="orange">
               <span class="check-icon">✓</span>
-              <span class="item-label">产品规划</span>
-              <span class="item-count" id="countSourcePlan">0</span>
+              <span class="color-dot" style="background:#f0a05a"></span>
+              <span class="item-label">橙色</span>
+              <span class="item-count" id="countColorOrange">0</span>
+            </div>
+            <div class="filter-dropdown-item" data-filter="color" data-value="yellow">
+              <span class="check-icon">✓</span>
+              <span class="color-dot" style="background:#f0b750"></span>
+              <span class="item-label">黄色</span>
+              <span class="item-count" id="countColorYellow">0</span>
+            </div>
+            <div class="filter-dropdown-item" data-filter="color" data-value="green">
+              <span class="check-icon">✓</span>
+              <span class="color-dot" style="background:#56c9a0"></span>
+              <span class="item-label">绿色</span>
+              <span class="item-count" id="countColorGreen">0</span>
+            </div>
+            <div class="filter-dropdown-item" data-filter="color" data-value="blue">
+              <span class="check-icon">✓</span>
+              <span class="color-dot" style="background:#7c8cf5"></span>
+              <span class="item-label">蓝色</span>
+              <span class="item-count" id="countColorBlue">0</span>
+            </div>
+            <div class="filter-dropdown-item" data-filter="color" data-value="purple">
+              <span class="check-icon">✓</span>
+              <span class="color-dot" style="background:#a78bfa"></span>
+              <span class="item-label">紫色</span>
+              <span class="item-count" id="countColorPurple">0</span>
             </div>
           </div>
         </div>
@@ -2061,8 +2147,8 @@
         <table>
           <thead>
             <tr>
-              <th style="width:40px">#</th>
-              <th style="width:80px">来源</th>
+              <th style="width:50px">#</th>
+              <th style="width:140px">标题</th>
               <th style="width:200px">需求内容</th>
               <th style="width:240px">背景/价值</th>
               <th style="width:100px">预期效果</th>
@@ -2112,12 +2198,8 @@
     <div class="modal-body">
       <input type="hidden" id="editId">
       <div class="form-group">
-        <label>需求来源</label>
-        <select id="editSource">
-          <option value="用户反馈">用户反馈</option>
-          <option value="用户调研">用户调研</option>
-          <option value="产品规划">产品规划</option>
-        </select>
+        <label>需求标题</label>
+        <input type="text" id="editTitle" placeholder="简短标题，20字以内" maxlength="20">
       </div>
       <div class="form-group">
         <label>需求内容</label>
@@ -2276,10 +2358,9 @@ function initSupabase() {
 const STORAGE_KEY = 'req_assistant_data';
 
 let requirements = [];
-let currentSource = 'auto';
 // 多选筛选器 - 空数组表示全部
 let filterPriority = [];
-let filterSource = [];
+let filterColor = [];
 let filterFiled = [];
 let filterSchedule = [];
 let searchQuery = '';
@@ -2305,12 +2386,13 @@ async function loadData() {
       // Convert from DB format to app format
       requirements = data.map(row => ({
         id: row.id,
+        title: row.title || '',
         content: row.content || '',
         background: row.background || '',
         expected: row.expected || '',
         proposer: row.proposer || '',
-        source: row.source,
         priority: row.priority,
+        color: row.color || '',
         remark: row.remark || '',
         remarkImages: row.remark_images || [],
         date: row.date,
@@ -2390,12 +2472,13 @@ async function cloudAddRequirement(req) {
       .from('requirements')
       .insert({
         id: req.id,
+        title: req.title || '',
         content: req.content || '',
         background: req.background || '',
         expected: req.expected || '',
         proposer: req.proposer || '',
-        source: req.source,
         priority: req.priority,
+        color: req.color || '',
         remark: req.remark || '',
         remark_images: imageUrls.length > 0 ? imageUrls : req.remarkImages,
         date: req.date,
@@ -2433,12 +2516,13 @@ async function cloudUpdateRequirement(req) {
     const { error } = await supabaseClient
       .from('requirements')
       .update({
+        title: req.title || '',
         content: req.content || '',
         background: req.background || '',
         expected: req.expected || '',
         proposer: req.proposer || '',
-        source: req.source,
         priority: req.priority,
+        color: req.color || '',
         remark: req.remark || '',
         remark_images: imageUrls,
         date: req.date,
@@ -2453,6 +2537,123 @@ async function cloudUpdateRequirement(req) {
     console.error('云端更新失败:', e);
     showToast('error', '云端同步失败');
   }
+}
+
+// ===== 批量生成标题 =====
+async function batchGenerateTitles() {
+  // 找出没有标题的需求
+  const noTitleReqs = requirements.filter(r => !r.title || r.title.trim() === '' || r.title === '-');
+  
+  if (noTitleReqs.length === 0) {
+    showToast('success', '所有需求都已有标题，无需补全');
+    return;
+  }
+  
+  if (!confirm(`发现 ${noTitleReqs.length} 条需求没有标题，是否使用 AI 批量生成？\n\n这将调用 LLM API 为每条需求生成简短标题。`)) {
+    return;
+  }
+  
+  showToast('info', `开始生成，共 ${noTitleReqs.length} 条...`);
+  
+  let successCount = 0;
+  let failCount = 0;
+  
+  for (const req of noTitleReqs) {
+    try {
+      // 调用 LLM 生成标题
+      const title = await generateTitleForReq(req);
+      
+      if (title) {
+        req.title = title;
+        successCount++;
+        
+        // 同步到云端
+        if (isCloudMode) {
+          await cloudUpdateRequirement(req);
+        }
+        
+        // 更新进度
+        if (successCount % 3 === 0 || successCount === noTitleReqs.length) {
+          showToast('info', `已完成 ${successCount}/${noTitleReqs.length}`);
+        }
+      } else {
+        failCount++;
+      }
+      
+      // 添加延迟避免 API 限流
+      await new Promise(resolve => setTimeout(resolve, 500));
+    } catch (e) {
+      console.error('生成标题失败:', e);
+      failCount++;
+    }
+  }
+  
+  // 保存数据
+  saveData();
+  renderTable();
+  
+  if (failCount === 0) {
+    showToast('success', `完成！已为 ${successCount} 条需求生成标题`);
+  } else {
+    showToast('warning', `完成！成功 ${successCount} 条，失败 ${failCount} 条`);
+  }
+}
+
+// 为单条需求生成标题
+async function generateTitleForReq(req) {
+  const systemPrompt = `你是一个产品需求标题生成助手。根据需求内容生成一个简短的标题。
+要求：
+- 标题长度在 10-20 字以内
+- 简洁概括需求的核心内容
+- 不要使用标点符号
+- 直接返回标题文本，不要有任何其他内容`;
+
+  const userContent = `需求内容：${req.content || ''}
+需求背景：${req.background || ''}
+预期效果：${req.expected || ''}`;
+
+  try {
+    const resp = await fetch(LLM_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${LLM_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: LLM_MODEL,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userContent }
+        ],
+        temperature: 0.3,
+        max_tokens: 50
+      })
+    });
+
+    if (!resp.ok) throw new Error('API request failed: ' + resp.status);
+
+    const data = await resp.json();
+    let title = data.choices?.[0]?.message?.content?.trim();
+    
+    if (title) {
+      // 清理可能的引号和多余空白
+      title = title.replace(/^["'""'']+|["'""'']+$/g, '').trim();
+      // 限制长度
+      if (title.length > 25) {
+        title = title.substring(0, 22) + '...';
+      }
+      return title;
+    }
+  } catch (e) {
+    console.warn('LLM 生成标题失败:', e);
+  }
+  
+  // 降级方案：从内容中截取
+  const content = req.content || '';
+  if (content.length > 0) {
+    return content.substring(0, 20).replace(/[，。！？,.!?].*$/, '').trim();
+  }
+  return null;
 }
 
 async function cloudDeleteRequirement(id) {
@@ -2613,12 +2814,13 @@ async function startMigration() {
         .from('requirements')
         .upsert({
           id: req.id,
+          title: req.title || '',
           content: req.content || '',
           background: req.background || '',
           expected: req.expected || '',
           proposer: req.proposer || '',
-          source: req.source,
           priority: req.priority,
+          color: req.color || '',
           remark: req.remark || '',
           remark_images: imageUrls.length > 0 ? imageUrls : (req.remarkImages || []),
           date: req.date,
@@ -2811,6 +3013,81 @@ function clearSelectedImages() {
   renderTable();
 }
 
+// ===== Color Functions =====
+const colorMap = {
+  '': '#e8e8e8',
+  'red': '#ee7777',
+  'orange': '#f0a05a',
+  'yellow': '#f0b750',
+  'green': '#56c9a0',
+  'blue': '#7c8cf5',
+  'purple': '#a78bfa'
+};
+
+function getColorBackground(color) {
+  return colorMap[color || ''] || colorMap[''];
+}
+
+let activeColorPicker = null;
+
+function openColorPicker(reqId, event) {
+  event.stopPropagation();
+  
+  // 关闭已存在的颜色选择器
+  closeColorPicker();
+  
+  const colors = ['', 'red', 'orange', 'yellow', 'green', 'blue', 'purple'];
+  const req = requirements.find(r => r.id === reqId);
+  
+  const picker = document.createElement('div');
+  picker.className = 'color-picker-popup';
+  picker.innerHTML = colors.map(c => {
+    const isActive = (req.color || '') === c;
+    return `<div class="color-option ${isActive ? 'active' : ''}" 
+                 style="background:${colorMap[c]}" 
+                 data-color="${c}" 
+                 onclick="setColor('${reqId}', '${c}')">
+              ${isActive ? '✓' : ''}
+            </div>`;
+  }).join('');
+  
+  // 定位到点击的元素旁边
+  const rect = event.target.getBoundingClientRect();
+  picker.style.position = 'fixed';
+  picker.style.top = (rect.bottom + 4) + 'px';
+  picker.style.left = rect.left + 'px';
+  picker.style.zIndex = '2000';
+  
+  document.body.appendChild(picker);
+  activeColorPicker = picker;
+  
+  // 点击外部关闭
+  setTimeout(() => {
+    document.addEventListener('click', closeColorPicker, { once: true });
+  }, 0);
+}
+
+function closeColorPicker() {
+  if (activeColorPicker) {
+    activeColorPicker.remove();
+    activeColorPicker = null;
+  }
+}
+
+async function setColor(reqId, color) {
+  const req = requirements.find(r => r.id === reqId);
+  if (!req) return;
+  
+  req.color = color;
+  closeColorPicker();
+  
+  // 保存到云端
+  await cloudUpdateRequirement(req);
+  saveData();
+  renderTable();
+  showToast('success', '颜色已更新');
+}
+
 function genId() {
   return 'req_' + Date.now() + '_' + Math.random().toString(36).substr(2,6);
 }
@@ -2932,20 +3209,6 @@ function fillExample(el) {
   chatInput.value = text;
   chatInput.dispatchEvent(new Event('input'));
   chatInput.focus();
-
-  // Also set the right source
-  const labelEl = el.querySelector('.we-label');
-  if (labelEl) {
-    const labelText = labelEl.textContent.trim();
-    let source = 'auto';
-    if (labelText.includes('反馈')) source = '用户反馈';
-    else if (labelText.includes('调研')) source = '用户调研';
-    else if (labelText.includes('规划')) source = '产品规划';
-    document.querySelectorAll('.source-tag').forEach(t => {
-      t.classList.toggle('active', t.dataset.source === source);
-    });
-    currentSource = source;
-  }
 }
 
 // ===== LLM API Configuration =====
@@ -2953,11 +3216,11 @@ const LLM_API_KEY = 'sk-cbb3e5bd0a99442fb46f0c62a575c98b';
 const LLM_API_URL = 'https://api.deepseek.com/v1/chat/completions';
 const LLM_MODEL = 'deepseek-chat';
 
-async function callLLM(userText, source) {
+async function callLLM(userText) {
   const systemPrompt = `你是一个产品需求分析助手。用户会用自然语言描述需求，你需要提取结构化信息。
 请严格返回以下 JSON 格式（不要返回其他内容，不要用 markdown 代码块包裹）：
 {
-  "source": "用户反馈 或 用户调研 或 产品规划",
+  "title": "需求标题，10-20字以内的简短概括",
   "content": "需求内容摘要，一句话概括核心需求",
   "background": "需求背景和价值说明",
   "expected": "预期效果",
@@ -2969,9 +3232,7 @@ async function callLLM(userText, source) {
 - P0：线上故障、崩溃、严重bug、阻断用户核心流程
 - P1：体验差、性能慢、普遍反馈、影响核心功能
 - P2：功能建议、优化改进、一般性需求
-- P3：锦上添花、低优先级想法
-
-${source !== 'auto' ? '用户已指定来源为：' + source + '，请使用该来源。' : '请根据描述内容自动判断来源。'}`;
+- P3：锦上添花、低优先级想法`;
 
   try {
     const resp = await fetch(LLM_API_URL, {
@@ -3004,7 +3265,7 @@ ${source !== 'auto' ? '用户已指定来源为：' + source + '，请使用该�
 
     const parsed = JSON.parse(jsonStr);
     return {
-      source: parsed.source || '产品规划',
+      title: parsed.title || userText.substring(0, 20),
       content: parsed.content || userText.substring(0, 50),
       background: parsed.background || '',
       expected: parsed.expected || '待补充',
@@ -3013,19 +3274,13 @@ ${source !== 'auto' ? '用户已指定来源为：' + source + '，请使用该�
     };
   } catch (err) {
     console.warn('LLM API call failed, falling back to local parsing:', err);
-    return fallbackParse(userText, source);
+    return fallbackParse(userText);
   }
 }
 
 // Fallback: local regex parsing when API fails
-function fallbackParse(text, source) {
-  const result = { source: source, content: '', background: '', expected: '待补充', proposer: '未知', priority: 'P2' };
-
-  if (source === 'auto') {
-    if (/反馈|用户说|客户说|吐槽|抱怨|投诉/.test(text)) result.source = '用户反馈';
-    else if (/调研|访谈|问卷|座谈|走访/.test(text)) result.source = '用户调研';
-    else result.source = '产品规划';
-  }
+function fallbackParse(text) {
+  const result = { title: '', content: '', background: '', expected: '待补充', proposer: '未知', priority: 'P2' };
 
   const proposerMatch = text.match(/(?:用户|客户)?([^\s,，。：:]{1,6}?)(?:反馈|说|提到|建议|希望|觉得|认为|吐槽|表示|提出)/);
   if (proposerMatch && proposerMatch[1].length <= 6 && !/今天|昨天|最近|大家|他们|很多|用户们|普遍/.test(proposerMatch[1])) {
@@ -3043,7 +3298,9 @@ function fallbackParse(text, source) {
   }
   if (!result.content) result.content = text.substring(0, 50);
 
-  result.background = result.source === '用户反馈' ? '来自用户直接反馈' : result.source === '用户调研' ? '来自用户调研洞察' : '产品经理基于产品体验/规划提出';
+  // Generate title from content
+  result.title = result.content.substring(0, 20);
+  result.background = '待补充';
 
   return result;
 }
@@ -3161,10 +3418,10 @@ function buildCardPreviewHtml(req) {
   return `
     <div class="req-card-preview">
       <div class="rcp-header">
-        <span class="tag tag-source">${req.source}</span>
         <span class="tag ${priorityClass}">${req.priority}</span>
         <span class="tag ${filedClass}">${filedText}</span>
       </div>
+      <div class="rcp-row"><span class="rcp-label">标题</span><span class="rcp-value" style="font-weight:600">${escapeHtml(req.title || '无标题')}</span></div>
       <div class="rcp-row"><span class="rcp-label">需求内容</span><span class="rcp-value">${escapeHtml(req.content)}</span></div>
       <div class="rcp-row"><span class="rcp-label">背景/价值</span><span class="rcp-value">${escapeHtml(req.background)}</span></div>
       <div class="rcp-row"><span class="rcp-label">预期效果</span><span class="rcp-value">${escapeHtml(req.expected)}</span></div>
@@ -3196,19 +3453,20 @@ async function handleSend() {
 
   try {
     // Call LLM API to parse the requirement
-    const parsed = await callLLM(text || '用户附图需求', currentSource);
+    const parsed = await callLLM(text || '用户附图需求');
 
     removeTypingIndicator();
 
     const req = {
       id: genId(),
-      source: parsed.source,
+      title: parsed.title,
       content: parsed.content,
       background: parsed.background,
       expected: parsed.expected,
       proposer: parsed.proposer,
       date: today(),
       priority: parsed.priority,
+      color: '',
       filed: 'no',
       remark: '',
       remarkImages: images.length > 0 ? [...images] : [],
@@ -3276,14 +3534,22 @@ function updateFilterCounts() {
   document.getElementById('countPriorityP2').textContent = countP2;
   document.getElementById('countPriorityP3').textContent = countP3;
   
-  // 来源计数
-  const countFeedback = requirements.filter(r => r.source === '用户反馈').length;
-  const countResearch = requirements.filter(r => r.source === '用户调研').length;
-  const countPlan = requirements.filter(r => r.source === '产品规划').length;
+  // 颜色计数
+  const countColorNone = requirements.filter(r => !r.color || r.color === '').length;
+  const countColorRed = requirements.filter(r => r.color === 'red').length;
+  const countColorOrange = requirements.filter(r => r.color === 'orange').length;
+  const countColorYellow = requirements.filter(r => r.color === 'yellow').length;
+  const countColorGreen = requirements.filter(r => r.color === 'green').length;
+  const countColorBlue = requirements.filter(r => r.color === 'blue').length;
+  const countColorPurple = requirements.filter(r => r.color === 'purple').length;
   
-  document.getElementById('countSourceFeedback').textContent = countFeedback;
-  document.getElementById('countSourceResearch').textContent = countResearch;
-  document.getElementById('countSourcePlan').textContent = countPlan;
+  document.getElementById('countColorNone').textContent = countColorNone;
+  document.getElementById('countColorRed').textContent = countColorRed;
+  document.getElementById('countColorOrange').textContent = countColorOrange;
+  document.getElementById('countColorYellow').textContent = countColorYellow;
+  document.getElementById('countColorGreen').textContent = countColorGreen;
+  document.getElementById('countColorBlue').textContent = countColorBlue;
+  document.getElementById('countColorPurple').textContent = countColorPurple;
   
   // 状态计数
   const countNo = requirements.filter(r => r.filed === 'no').length;
@@ -3316,12 +3582,12 @@ function renderTable() {
   let filtered = requirements.filter(r => {
     // 多选筛选：数组为空表示全部，否则检查是否包含
     if (filterPriority.length > 0 && !filterPriority.includes(r.priority)) return false;
-    if (filterSource.length > 0 && !filterSource.includes(r.source)) return false;
+    if (filterColor.length > 0 && !filterColor.includes(r.color || '')) return false;
     if (filterFiled.length > 0 && !filterFiled.includes(r.filed)) return false;
     if (filterSchedule.length > 0 && !filterSchedule.includes(r.schedule || '')) return false;
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
-      return (r.content + r.background + r.proposer + r.expected + (r.remark||'') + (r.other||'')).toLowerCase().includes(q);
+      return ((r.title||'') + r.content + r.background + r.proposer + r.expected + (r.remark||'') + (r.other||'')).toLowerCase().includes(q);
     }
     return true;
   });
@@ -3352,12 +3618,17 @@ function renderTable() {
     const ft = r.filed === 'yes' ? '已提单' : '未提单';
     const scheduleText = r.schedule || '暂定';
     const scheduleClass = r.schedule ? 'tag-schedule' : 'tag-schedule-none';
+    const colorBg = getColorBackground(r.color);
     const tapdBtn = r.filed === 'yes' 
       ? `<button class="btn btn-sm" onclick="openTapdModal('${r.id}')" title="生成PRD" style="opacity:0.5">&#x1F4C4;</button>`
       : `<button class="btn btn-sm btn-primary" onclick="openTapdModal('${r.id}')" title="生成PRD" style="font-size:10px">&#x1F4C4; PRD</button>`;
     return `<tr data-req-id="${r.id}">
-      <td>${i + 1}</td>
-      <td class="editable-cell" data-field="source" ondblclick="startInlineEdit(this, '${r.id}', 'source')"><span class="tag tag-source">${r.source}</span></td>
+      <td>
+        <div class="color-index" style="background:${colorBg}" onclick="openColorPicker('${r.id}', event)" title="点击选择颜色">
+          ${i + 1}
+        </div>
+      </td>
+      <td class="td-title editable-cell" data-field="title" title="${escapeAttr(r.title || '')}" ondblclick="startInlineEdit(this, '${r.id}', 'title')">${escapeHtml(r.title || '-')}</td>
       <td class="td-title editable-cell" data-field="content" title="${escapeAttr(r.content)}" ondblclick="startInlineEdit(this, '${r.id}', 'content')">${escapeHtml(r.content)}</td>
       <td class="td-desc editable-cell" data-field="background" title="${escapeAttr(r.background)}" ondblclick="startInlineEdit(this, '${r.id}', 'background')">${escapeHtml(r.background)}</td>
       <td class="td-desc editable-cell" data-field="expected" title="${escapeAttr(r.expected)}" ondblclick="startInlineEdit(this, '${r.id}', 'expected')">${escapeHtml(r.expected)}</td>
@@ -3411,7 +3682,7 @@ document.querySelectorAll('.filter-dropdown-item').forEach(item => {
     let filterArray;
     switch (filterType) {
       case 'priority': filterArray = filterPriority; break;
-      case 'source': filterArray = filterSource; break;
+      case 'color': filterArray = filterColor; break;
       case 'filed': filterArray = filterFiled; break;
       case 'schedule': filterArray = filterSchedule; break;
     }
@@ -3438,14 +3709,14 @@ document.querySelectorAll('.filter-dropdown-item').forEach(item => {
 function updateFilterDropdownButton(filterType) {
   const nameMap = {
     priority: 'Priority',
-    source: 'Source', 
+    color: 'Color', 
     filed: 'Filed',
     schedule: 'Schedule'
   };
   
   const labelMap = {
     priority: '优先级',
-    source: '来源',
+    color: '颜色',
     filed: '状态',
     schedule: '排期'
   };
@@ -3453,7 +3724,7 @@ function updateFilterDropdownButton(filterType) {
   let filterArray;
   switch (filterType) {
     case 'priority': filterArray = filterPriority; break;
-    case 'source': filterArray = filterSource; break;
+    case 'color': filterArray = filterColor; break;
     case 'filed': filterArray = filterFiled; break;
     case 'schedule': filterArray = filterSchedule; break;
   }
@@ -3484,13 +3755,13 @@ function updateFilterDropdownButton(filterType) {
 
 // 更新所有下拉按钮状态
 function updateAllFilterButtons() {
-  ['priority', 'source', 'filed', 'schedule'].forEach(type => {
+  ['priority', 'color', 'filed', 'schedule'].forEach(type => {
     updateFilterDropdownButton(type);
     
     // 更新选中状态
     const nameMap = {
       priority: 'Priority',
-      source: 'Source',
+      color: 'Color',
       filed: 'Filed', 
       schedule: 'Schedule'
     };
@@ -3498,7 +3769,7 @@ function updateAllFilterButtons() {
     let filterArray;
     switch (type) {
       case 'priority': filterArray = filterPriority; break;
-      case 'source': filterArray = filterSource; break;
+      case 'color': filterArray = filterColor; break;
       case 'filed': filterArray = filterFiled; break;
       case 'schedule': filterArray = filterSchedule; break;
     }
@@ -3530,10 +3801,13 @@ function renderDashboard() {
   const filedCount = requirements.filter(r => r.filed === 'yes').length;
   const unfiledCount = total - filedCount;
 
-  const bySource = { '用户反馈': 0, '用户调研': 0, '产品规划': 0 };
+  const byColor = { '无颜色': 0, '红色': 0, '橙色': 0, '黄色': 0, '绿色': 0, '蓝色': 0, '紫色': 0 };
+  const colorLabels = { '': '无颜色', 'red': '红色', 'orange': '橙色', 'yellow': '黄色', 'green': '绿色', 'blue': '蓝色', 'purple': '紫色' };
+  const colorValues = { '无颜色': '#ccc', '红色': '#ee7777', '橙色': '#f0a05a', '黄色': '#f0b750', '绿色': '#56c9a0', '蓝色': '#7c8cf5', '紫色': '#a78bfa' };
   const byPriority = { P0: 0, P1: 0, P2: 0, P3: 0 };
   requirements.forEach(r => {
-    if (bySource[r.source] !== undefined) bySource[r.source]++;
+    const colorLabel = colorLabels[r.color || ''] || '无颜色';
+    byColor[colorLabel]++;
     if (byPriority[r.priority] !== undefined) byPriority[r.priority]++;
   });
 
@@ -3575,12 +3849,13 @@ function renderDashboard() {
       <h3>&#x1F4CA; 需求分布</h3>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
         <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:16px">
-          <div style="font-size:12px;color:var(--text-secondary);margin-bottom:12px;font-weight:500">按来源</div>
-          ${Object.entries(bySource).map(([k,v]) => `
+          <div style="font-size:12px;color:var(--text-secondary);margin-bottom:12px;font-weight:500">按颜色</div>
+          ${Object.entries(byColor).map(([k,v]) => `
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-              <span style="font-size:11px;color:var(--text-dim);width:60px">${k}</span>
+              <span style="width:12px;height:12px;border-radius:50%;background:${colorValues[k]};border:1px solid rgba(0,0,0,0.1)"></span>
+              <span style="font-size:11px;color:var(--text-dim);width:48px">${k}</span>
               <div style="flex:1;height:6px;background:var(--bg);border-radius:3px;overflow:hidden">
-                <div style="height:100%;width:${total ? v/total*100 : 0}%;background:var(--accent);border-radius:3px;transition:width .3s"></div>
+                <div style="height:100%;width:${total ? v/total*100 : 0}%;background:${colorValues[k]};border-radius:3px;transition:width .3s"></div>
               </div>
               <span style="font-size:11px;color:var(--text-secondary);width:24px;text-align:right">${v}</span>
             </div>
@@ -3783,7 +4058,7 @@ function openEdit(id) {
   if (!req) return;
 
   document.getElementById('editId').value = id;
-  document.getElementById('editSource').value = req.source;
+  document.getElementById('editTitle').value = req.title || '';
   document.getElementById('editContent').value = req.content;
   document.getElementById('editBackground').value = req.background;
   document.getElementById('editExpected').value = req.expected;
@@ -3823,12 +4098,12 @@ function saveEdit() {
 
   // Capture old values for change tracking
   const oldValues = isNew ? {} : {
-    source: req.source, content: req.content, background: req.background,
+    title: req.title, content: req.content, background: req.background,
     expected: req.expected, proposer: req.proposer, priority: req.priority,
     filed: req.filed, remark: req.remark, other: req.other, schedule: req.schedule
   };
 
-  req.source = document.getElementById('editSource').value;
+  req.title = document.getElementById('editTitle').value;
   req.content = document.getElementById('editContent').value;
   req.background = document.getElementById('editBackground').value;
   req.expected = document.getElementById('editExpected').value;
@@ -3845,7 +4120,7 @@ function saveEdit() {
     addHistory('add', req);
   } else {
     const changes = [];
-    const trackFields = ['source','content','background','expected','proposer','priority','filed','remark','other','schedule'];
+    const trackFields = ['title','content','background','expected','proposer','priority','filed','remark','other','schedule'];
     trackFields.forEach(f => {
       if ((oldValues[f] || '') !== (req[f] || '')) {
         changes.push({ field: f, from: oldValues[f] || '', to: req[f] || '' });
@@ -3900,7 +4175,7 @@ function markFiled(id, btnEl) {
 // Manual add
 document.getElementById('btnManualAdd').addEventListener('click', () => {
   document.getElementById('editId').value = '';
-  document.getElementById('editSource').value = '用户反馈';
+  document.getElementById('editTitle').value = '';
   document.getElementById('editContent').value = '';
   document.getElementById('editBackground').value = '';
   document.getElementById('editExpected').value = '';
@@ -4053,9 +4328,9 @@ function renderHistory() {
   };
 
   const fieldLabels = {
-    source: '来源', content: '需求内容', background: '背景/价值', expected: '预期效果',
+    title: '标题', content: '需求内容', background: '背景/价值', expected: '预期效果',
     proposer: '提出者', priority: '优先级', filed: '提单状态', schedule: '预估排期',
-    remark: '备注信息', other: '其他信息'
+    remark: '备注信息', other: '其他信息', color: '颜色'
   };
 
   let html = '';
@@ -4109,10 +4384,10 @@ document.getElementById('btnExport').addEventListener('click', () => {
   }
 
   // CSV export
-  const headers = ['来源', '需求内容', '背景/价值', '预期效果', '提出者', '日期', '优先级', '预估排期', '是否已提单', '备注信息', '其他信息'];
+  const headers = ['标题', '需求内容', '背景/价值', '预期效果', '提出者', '日期', '优先级', '预估排期', '是否已提单', '颜色标注', '备注信息', '其他信息'];
   const rows = requirements.map(r => [
-    r.source, r.content, r.background, r.expected, r.proposer, r.date, r.priority,
-    r.schedule || '', r.filed === 'yes' ? '已提单' : '未提单', r.remark || '', r.other || ''
+    r.title || '', r.content, r.background, r.expected, r.proposer, r.date, r.priority,
+    r.schedule || '', r.filed === 'yes' ? '已提单' : '未提单', r.color || '无', r.remark || '', r.other || ''
   ]);
 
   const BOM = '\uFEFF';
@@ -4196,7 +4471,7 @@ function startInlineEdit(cell, reqId, field) {
   // Create appropriate input element based on field type
   let inputHtml = '';
   const fieldConfig = {
-    source: { type: 'select', options: ['用户反馈', '用户调研', '产品规划'] },
+    title: { type: 'input', maxLength: 20 },
     priority: { type: 'select', options: ['P0', 'P1', 'P2', 'P3'] },
     filed: { type: 'select', options: [{ value: 'no', label: '未提单' }, { value: 'yes', label: '已提单' }] },
     schedule: { type: 'select', options: [{ value: '', label: '暂定' }, { value: '一期', label: '一期' }, { value: '二期', label: '二期' }, { value: '三期', label: '三期' }, { value: '四期', label: '四期' }] },
@@ -4523,8 +4798,11 @@ function closeTapdModal() {
 }
 
 function generatePrdContent(req) {
-  // 简化的纯文本格式：需求背景、需求内容、预期效果
-  let plain = `【需求背景】
+  // 简化的纯文本格式：需求标题、需求背景、需求内容、预期效果
+  let plain = `【需求标题】
+${req.title || '待补充'}
+
+【需求背景】
 ${req.background || '待补充'}
 
 【需求内容】
